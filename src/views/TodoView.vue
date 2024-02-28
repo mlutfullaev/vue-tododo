@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import TodoCreate from '@/components/TodoCreate.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { TodoT, TodoCreateT } from '@/assets/types'
 import TodoItem from '@/components/TodoItem.vue'
 import BaseModal from '@/components/BaseModal.vue'
 
-const todos = ref<TodoT[]>([])
-const modal = ref(true)
+const LS = localStorage.getItem('todos')
+const todos = ref<TodoT[]>(LS ? JSON.parse(LS) : [])
+const modal = ref(false)
 const createTodo = (todo: TodoCreateT) => {
   const todoItem = {
     ...todo,
@@ -14,70 +15,74 @@ const createTodo = (todo: TodoCreateT) => {
     checked: false
   }
   todos.value = [...todos.value, todoItem]
-
-  localStorage.setItem('todos', JSON.stringify(todos.value))
 }
 
 const deleteTodo = (createdAt: number) => {
   todos.value = todos.value.filter(todo => todo.createdAt !== createdAt)
 }
 
-const updateTodo = (todo: TodoT) => {
-  console.log(todo)
+watch(todos, () => {
+  localStorage.setItem('todos', JSON.stringify(todos.value))
+})
+const updateTodo = (i: number, todo: TodoT) => {
+  todos.value[i] = todo
+  localStorage.setItem('todos', JSON.stringify(todos.value))
 }
 </script>
 
 <template>
- <div class='todo'>
-   <base-modal :active="modal" @close="modal = false">
-     <todo-create @create="createTodo"/>
-   </base-modal>
-   <todo-item v-for="todo in todos" @update="updateTodo" @delete="deleteTodo" :key="todo.createdAt" :todo="todo"/>
- </div>
+  <base-modal :active="modal" @close="modal = false">
+    <todo-create @close="modal = false" @create="createTodo"/>
+  </base-modal>
+  <div class='todo'>
+    <h1>Todos</h1>
+    <button class="create-btn" @click="modal = true">Create Todo</button>
+    <p class="not-found" v-if="!todos.length">There is no todo yet</p>
+    <div class="items">
+      <todo-item
+        v-for="(todo, i) in todos"
+        @update="updateTodo"
+        @delete="deleteTodo"
+        :key="todo.createdAt"
+        :i="i"
+        :todo="todo"
+      />
+    </div>
+  </div>
 </template>
 
-<style lang="scss">
-input[type="radio"],
-input[type="checkbox"] {
-  display: none;
-}
+<style lang="scss" scoped>
+.todo {
+  position: relative;
+  padding: 50px;
 
-.bubble {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #3A82EE;
-  box-shadow: 0 0 4px rgba(58, 130, 238, 0.75);
+  @media (max-width: 540px) {
+    padding: 50px 20px;
+  }
+  h1 {
+    font-size: 46px;
+    text-align: center;
+    padding-bottom: 20px;
+  }
+  .not-found {
+    font-size: 20px;
+    text-align: center;
+  }
+  .create-btn {
+    position: absolute;
+    right: 50px;
+    top: 50px;
 
-  &.personal {
-    border-color: #EA40A4;
-    box-shadow: 0 0 4px rgba(234, 64, 164, 0.75);
-
-    &::after {
-      background-color: #EA40A4;
-      box-shadow: 0 0 4px rgba(234, 64, 164, 0.75);
+    @media (max-width: 540px) {
+      top: 0;
+      right: 20px;
     }
   }
-  &::after {
-    content: "";
-    display: block;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    background-color: #3A82EE;
-    box-shadow: 0 0 4px rgba(58, 130, 238, 0.75);
-    border-radius: 50%;
-    transition: 0.2s ease-in-out;
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
-}
-
-input:checked ~ label .bubble::after {
-  width: 10px;
-  height: 10px;
-  opacity: 1;
 }
 
 </style>

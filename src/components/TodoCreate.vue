@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { TodoCreateT } from '@/assets/types'
-const emit = defineEmits<{(event: 'create', todo: TodoCreateT): void}>()
+const emit = defineEmits<{(event: 'create', todo: TodoCreateT): void, (event: 'close'): void}>()
 
 const name = ref('')
 const description = ref('')
@@ -9,7 +9,7 @@ const type = ref<'business' | 'personal' | ''>('')
 const error = ref(false)
 
 const create = () => {
-  if (!type.value || !description.value || !name.value) {
+  if (!type.value || !name.value) {
     error.value = true
     return
   }
@@ -19,16 +19,16 @@ const create = () => {
     description: description.value,
     type: type.value
   })
+  emit('close')
 }
 </script>
 
 <template>
   <div class="todo-create">
     <h1>Create Todo</h1>
-    <input type="text" v-model="name" placeholder="Name">
+    <input type="text" v-model="name" placeholder="*Name">
     <p v-if="error && !name">*You should write a name</p>
     <textarea v-model="description" placeholder="Description" name="" id="" rows="4"></textarea>
-    <p v-if="error && !description">*You should write a description</p>
     <div class="options">
       <div class="option">
         <input
@@ -39,7 +39,7 @@ const create = () => {
           v-model="type"/>
         <label for="business">
           <span class="bubble business"></span>
-          <span>business</span>
+          <span>Business</span>
         </label>
       </div>
       <div class="option">
@@ -51,7 +51,7 @@ const create = () => {
           v-model="type"/>
         <label for="personal">
           <span class="bubble personal"></span>
-          <span>personal</span>
+          <span>Personal</span>
         </label>
       </div>
     </div>
@@ -101,17 +101,11 @@ const create = () => {
     }
   }
   button {
-    background: #3A82EE;
-    border-radius: 4px;
-    border: none;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    padding: 10px 15px;
-    cursor: pointer;
-    color: #fff;
-    font-size: 16px;
+
     img {
       width: 18px;
       height: auto;

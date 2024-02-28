@@ -18,18 +18,29 @@ header {
   padding: 30px 50px;
   justify-content: space-between;
 
+  @media (max-width: 540px) {
+    padding: 20px 30px;
+  }
   a {
     text-decoration: none;
     color: #444;
     font-size: 20px;
     transition: .3s;
-    &:hover, &.router-link-active  {
+    &:hover {
       color: #3A82EE
+    }
+
+    @media (max-width: 540px) {
+      font-size: 16px;
     }
   }
   nav {
     display: flex;
     gap: 20px;
+
+    .router-link-active {
+      color: #3A82EE
+    }
   }
 }
 </style>

@@ -14,6 +14,7 @@ defineEmits<{(event: 'close'): void}>()
 <style scoped lang="scss">
 .modal {
   position: fixed;
+  z-index: 2;
   height: 100vh;
   width: 100vw;
   background: rgba(0, 0, 0, 0.2);
@@ -24,6 +25,8 @@ defineEmits<{(event: 'close'): void}>()
   transition: .3s;
   user-select: none;
   pointer-events: none;
+  top: 0;
+  left: 0;
   &.active {
     opacity: 1;
     user-select: auto;

@@ -1,4 +1,5 @@
 <template>
+  <TheHeader />
   <router-view/>
 </template>
 
@@ -15,3 +16,6 @@
   color: #2c3e50;
 }
 </style>
+<script setup lang="ts">
+import TheHeader from '@/components/TheHeader.vue'
+</script>
